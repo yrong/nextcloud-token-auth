@@ -19,4 +19,7 @@ $CONFIG = array (
   'dbuser' => 'oc_admin',
   'dbpassword' => 'B4NpP6Q5im1A7typXEF1OB4Pa/ZkoJ',
   'installed' => true,
+  'theme' => 'mytheme',
+  'checkcookie' => false,
+  'auth_url' => 'http://localhost:3002/auth/check',
 );

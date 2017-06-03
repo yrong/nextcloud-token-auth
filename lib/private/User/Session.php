@@ -421,6 +421,10 @@ class Session implements IUserSession, Emitter {
 	}
 
 	protected function supportsCookies(IRequest $request) {
+        $check_cookie = \OC::$server->getConfig()->getSystemValue('checkcookie', false);
+        if(!$check_cookie){
+            return true;
+        }
 		if (!is_null($request->getCookie('cookie_test'))) {
 			return true;
 		}
@@ -745,7 +749,89 @@ class Session implements IUserSession, Emitter {
 		return true;
 	}
 
-	/**
+    /**
+     * @param IRequest $request
+     * @return bool
+     */
+    public function tryThirdPartyTokenLogin(IRequest $request) {
+        $token_name = 'fs_auth_token';
+        $token = $request->getParam($token_name);
+        if(!is_null($token)){
+            return $this->checkThirdPartyToken($request,$token);
+        }
+        return false;
+    }
+
+    /**
+     * @param $token
+     * @return bool
+     * @throws LoginException
+     */
+    private function checkThirdPartyToken($request,$token) {
+        // check token from auth api
+        $method = 'POST';
+        $uri = \OC::$server->getConfig()->getSystemValue('auth_url', 'http://localhost:3002/auth/check');
+        $token_string = json_encode(array("token" => $token));
+        $result_json = json_decode($this->curlAPI($method,$uri,$token_string));
+
+        if($result_json->status == 'ok'&&!is_null($result_json->data->local)){
+            $user = $result_json->data->local;
+            $user_name = $user->alias;
+            $user_passwd = $user->passwd;
+            if ($this->logClientIn($user_name, $user_passwd, $request, \OC::$server->getBruteForceThrottler())) {
+                $this->session->set(
+                    Auth::DAV_AUTHENTICATED, $this->getUser()->getUID()
+                );
+                $this->session->set('last-password-confirm', $this->timeFactory->getTime());
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * @param $method
+     * @param $url
+     * @param bool $data
+     * @return mixed
+     */
+    private static function curlAPI($method, $url, $data = false)
+    {
+        $curl = curl_init();
+
+        switch ($method)
+        {
+            case "POST":
+                curl_setopt($curl, CURLOPT_POST, 1);
+
+                if ($data)
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+                break;
+            case "PUT":
+                curl_setopt($curl, CURLOPT_PUT, 1);
+                break;
+            default:
+                if ($data)
+                    $url = sprintf("%s?%s", $url, http_build_query($data));
+        }
+
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data))
+        );
+
+        $result = curl_exec($curl);
+
+        curl_close($curl);
+
+        return $result;
+    }
+
+
+    /**
 	 * perform login using the magic cookie (remember login)
 	 *
 	 * @param string $uid the username

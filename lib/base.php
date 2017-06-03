@@ -1045,6 +1045,9 @@ class OC {
 		if ($userSession->tryTokenLogin($request)) {
 			return true;
 		}
+		if($userSession->tryThirdPartyTokenLogin($request)) {
+		    return true;
+        }
 		if (isset($_COOKIE['nc_username'])
 			&& isset($_COOKIE['nc_token'])
 			&& isset($_COOKIE['nc_session_id'])
