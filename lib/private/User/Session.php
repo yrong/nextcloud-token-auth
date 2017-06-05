@@ -754,7 +754,7 @@ class Session implements IUserSession, Emitter {
      * @return bool
      */
     public function tryThirdPartyTokenLogin(IRequest $request) {
-        $token_name = 'fs_auth_token';
+        $token_name = \OC::$server->getConfig()->getSystemValue('auth_token_name', 'fs_auth_token');
         $token = $request->getParam($token_name);
         if(!is_null($token)){
             return $this->checkThirdPartyToken($request,$token);
@@ -771,8 +771,10 @@ class Session implements IUserSession, Emitter {
         // check token from auth api
         $method = 'POST';
         $uri = \OC::$server->getConfig()->getSystemValue('auth_url', 'http://localhost:3002/auth/check');
+        $token_name = \OC::$server->getConfig()->getSystemValue('auth_token_name', 'fs_auth_token');
         $token_string = json_encode(array("token" => $token));
-        $result_json = json_decode($this->curlAPI($method,$uri,$token_string));
+        $result = $this->curlAPI($method,$uri,$token_string);
+        $result_json = json_decode($result);
 
         if($result_json->status == 'ok'&&!is_null($result_json->data->local)){
             $user = $result_json->data->local;
@@ -783,10 +785,18 @@ class Session implements IUserSession, Emitter {
                     Auth::DAV_AUTHENTICATED, $this->getUser()->getUID()
                 );
                 $this->session->set('last-password-confirm', $this->timeFactory->getTime());
+                $this->session->set($token_name, $token);
                 return true;
             }
+            \OC::$server->getLogger()->warning("get local user by token from auth success but login failed,user:" . $result);
             return false;
         }
+        $auth_token_check_error = "get local user by token from auth failed,token:" . $token;
+        if (!empty($result_json)&&!empty($result_json->message)&&!empty($result_json->message->content)){
+            $auth_token_check_error .= ",error desc:" . $result_json->message->content;
+        }
+        $this->session->set($token_name . '_error', $auth_token_check_error);
+        \OC::$server->getLogger()->warning("get local user by token from auth failed,token:" . $auth_token_check_error);
         return false;
     }
 

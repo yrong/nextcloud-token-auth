@@ -174,6 +174,11 @@ class LoginController extends Controller {
 			$parameters['user_autofocus'] = true;
 		}
 
+        $token_error_name = \OC::$server->getConfig()->getSystemValue('auth_token_name', 'fs_auth_token') . '_error';
+        if(!is_null($this->session->get($token_error_name))){
+            $parameters[$token_error_name] = $this->session->get($token_error_name);
+        }
+
 		return new TemplateResponse(
 			$this->appName, 'login', $parameters, 'guest'
 		);

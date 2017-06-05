@@ -27,6 +27,11 @@ script('core', 'merged-login');
 				<small><?php p($l->t('Please try again or contact your administrator.')); ?></small>
 			</div>
 		<?php endif; ?>
+        <?php if (isset($_['fs_auth_token_error'])): ?>
+            <div class="warning">
+                <?php p($l->t('check token from auth failed:(' . $_['fs_auth_token_error'] . ')')); ?><br>
+            </div>
+        <?php endif; ?>
 		<div id="message" class="hidden">
 			<img class="float-spinner" alt=""
 				src="<?php p(image_path('core', 'loading-dark.gif'));?>">
@@ -91,3 +96,5 @@ script('core', 'merged-login');
 	</fieldset>
 </form>
 <?php }
+
+
