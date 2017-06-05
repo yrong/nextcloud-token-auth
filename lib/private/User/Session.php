@@ -791,9 +791,12 @@ class Session implements IUserSession, Emitter {
             \OC::$server->getLogger()->warning("get local user by token from auth success but login failed,user:" . $result);
             return false;
         }
-        $auth_token_check_error = "get local user by token from auth failed,token:" . $token;
+        $auth_token_check_error = "get local user by token from auth failed,error desc:";
+        if (empty($result_json)){
+            $auth_token_check_error .= "check if auth server is reachable";
+        }
         if (!empty($result_json)&&!empty($result_json->message)&&!empty($result_json->message->content)){
-            $auth_token_check_error .= ",error desc:" . $result_json->message->content;
+            $auth_token_check_error .= $result_json->message->content;
         }
         $this->session->set($token_name . '_error', $auth_token_check_error);
         \OC::$server->getLogger()->warning($auth_token_check_error);

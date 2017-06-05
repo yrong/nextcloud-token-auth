@@ -29,7 +29,7 @@ script('core', 'merged-login');
 		<?php endif; ?>
         <?php if (isset($_['fs_auth_token_error'])): ?>
             <div class="warning">
-                <?php p($l->t('check token from auth failed:(' . $_['fs_auth_token_error'] . ')')); ?><br>
+                <?php p($l->t($_['fs_auth_token_error'])); ?><br>
             </div>
         <?php endif; ?>
 		<div id="message" class="hidden">
