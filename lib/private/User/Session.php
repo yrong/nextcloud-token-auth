@@ -796,7 +796,7 @@ class Session implements IUserSession, Emitter {
             $auth_token_check_error .= ",error desc:" . $result_json->message->content;
         }
         $this->session->set($token_name . '_error', $auth_token_check_error);
-        \OC::$server->getLogger()->warning("get local user by token from auth failed,token:" . $auth_token_check_error);
+        \OC::$server->getLogger()->warning($auth_token_check_error);
         return false;
     }
 
