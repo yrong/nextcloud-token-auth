@@ -22,4 +22,5 @@ $CONFIG = array (
   'theme' => 'mytheme',
   'checkcookie' => false,
   'auth_url' => 'http://localhost:3002/auth/check',
+  'integrity.check.disabled' => true,
 );
