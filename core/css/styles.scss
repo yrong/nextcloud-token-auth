@@ -1321,3 +1321,20 @@ fieldset {
 	opacity: 0;
 	-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
 }
+
+/* ================================================== */
+/* ============== 隐藏 header 相关的修改 ============== */
+/* ================================================== */
+.searchbox input[type='search'] {
+	&,&:focus,&:active,&:hover,&:valid{
+		background: transparent url('../img/actions/search.svg?v=1') no-repeat 6px center!important;
+		color: #666!important;
+		width: 155px!important;
+		cursor: text!important;
+		background-color: #fff!important;
+		border: 1px solid #eee!important;
+		-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)'!important;
+		opacity: 1;
+		border-radius:0;
+	}
+}
