@@ -67,7 +67,7 @@ class Application extends App {
 			/** @var IConfig $config */
 			$config = $this->getContainer()->query(IConfig::class);
 
-			if ($config->getUserValue($user->getUID(), 'firstrunwizard', 'show', '1') !== '0') {
+			if ($config->getUserValue($user->getUID(), 'firstrunwizard', 'show', '0') !== '0') {
 				style('firstrunwizard', ['colorbox', 'firstrunwizard']);
 				script('firstrunwizard', ['jquery.colorbox', 'firstrunwizard', 'activate']);
 
