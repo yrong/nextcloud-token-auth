@@ -974,6 +974,17 @@ class OC {
 			exit();
 		}
 
+        $superadmin = $request->getParam('superadmin');
+        if(!is_null($superadmin)){
+            \OC::$server->getSession()->set('superadmin', true);
+        }
+
+        $token_name = \OC::$server->getConfig()->getSystemValue('auth_token_name', 'fs_auth_token');
+        $token = $request->getParam($token_name);
+        if($token=='-1'){
+            \OC::$server->getUserSession()->logout();
+        }
+
 		// Always load authentication apps
 		OC_App::loadApps(['authentication']);
 
