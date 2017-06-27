@@ -48,6 +48,7 @@ use OCP\IRequest;
 use OCA\Theming\Util;
 use OCP\ITempManager;
 use OCP\IURLGenerator;
+use OCP\ISession;
 
 /**
  * Class ThemingController
@@ -73,6 +74,8 @@ class ThemingController extends Controller {
 	private $appData;
 	/** @var SCSSCacher */
 	private $scssCacher;
+    /** @var ISession*/
+    private $session;
 
 	/**
 	 * ThemingController constructor.
@@ -87,6 +90,7 @@ class ThemingController extends Controller {
 	 * @param ITempManager $tempManager
 	 * @param IAppData $appData
 	 * @param SCSSCacher $scssCacher
+     * @param ISession $session
 	 */
 	public function __construct(
 		$appName,
@@ -98,7 +102,8 @@ class ThemingController extends Controller {
 		IL10N $l,
 		ITempManager $tempManager,
 		IAppData $appData,
-		SCSSCacher $scssCacher
+		SCSSCacher $scssCacher,
+        ISession $session
 	) {
 		parent::__construct($appName, $request);
 
@@ -110,6 +115,7 @@ class ThemingController extends Controller {
 		$this->tempManager = $tempManager;
 		$this->appData = $appData;
 		$this->scssCacher = $scssCacher;
+        $this->session = $session;
 	}
 
 	/**
@@ -372,7 +378,7 @@ class ThemingController extends Controller {
 		 * We cannot rely on automatic caching done by \OC_Util::addStyle,
 		 * since we need to add the cacheBuster value to the url
 		 */
-		$cssCached = $this->scssCacher->process(\OC::$SERVERROOT, $appPath . '/css/theming.scss', 'theming');
+		$cssCached = $this->scssCacher->process(\OC::$SERVERROOT, $appPath . '/css/theming.scss', 'theming',$this->session);
 		if(!$cssCached) {
 			return new NotFoundResponse();
 		}
@@ -380,12 +386,12 @@ class ThemingController extends Controller {
 		try {
 			$cssFile = $this->scssCacher->getCachedCSS('theming', 'theming.css');
 			$response = new FileDisplayResponse($cssFile, Http::STATUS_OK, ['Content-Type' => 'text/css']);
-			$response->cacheFor(86400);
-			$expires = new \DateTime();
-			$expires->setTimestamp($this->timeFactory->getTime());
-			$expires->add(new \DateInterval('PT24H'));
-			$response->addHeader('Expires', $expires->format(\DateTime::RFC1123));
-			$response->addHeader('Pragma', 'cache');
+//			$response->cacheFor(86400);
+//			$expires = new \DateTime();
+//			$expires->setTimestamp($this->timeFactory->getTime());
+//			$expires->add(new \DateInterval('PT24H'));
+//			$response->addHeader('Expires', $expires->format(\DateTime::RFC1123));
+//			$response->addHeader('Pragma', 'cache');
 			return $response;
 		} catch (NotFoundException $e) {
 			return new NotFoundResponse();

@@ -1533,9 +1533,13 @@ $CONFIG = array(
 /**
  * for auth integration
  */
-'theme' => 'mytheme',
 'checkcookie' => false,
 'auth_url' => 'http://localhost:3002/auth/check',
 'integrity.check.disabled' => true,
 'auth_token_name' => 'fs_auth_token',
+
+/**
+ * hide header
+ */
+'hideheader' => false,
 );

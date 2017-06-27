@@ -88,7 +88,7 @@ class SCSSCacher {
 	 * @param string $app The app name
 	 * @return boolean
 	 */
-	public function process($root, $file, $app) {
+	public function process($root, $file, $app, $session=null) {
 		$path = explode('/', $root . '/' . $file);
 
 		$fileNameSCSS = array_pop($path);
@@ -106,10 +106,10 @@ class SCSSCacher {
 		}
 
 
-		if(!$this->variablesChanged() && $this->isCached($fileNameCSS, $folder)) {
+		if(!$this->variablesChanged($session) && $this->isCached($fileNameCSS, $folder)) {
 			return true;
 		}
-		return $this->cache($path, $fileNameCSS, $fileNameSCSS, $folder, $webDir);
+		return $this->cache($path, $fileNameCSS, $fileNameSCSS, $folder, $webDir,$session);
 	}
 
 	/**
@@ -158,8 +158,8 @@ class SCSSCacher {
 	 * Check if the variables file has changed
 	 * @return bool
 	 */
-	private function variablesChanged() {
-		$injectedVariables = $this->getInjectedVariables();
+	private function variablesChanged($session) {
+		$injectedVariables = $this->getInjectedVariables($session);
 		if($this->config->getAppValue('core', 'scss.variables') !== md5($injectedVariables)) {
 			$this->resetCache();
 			$this->config->setAppValue('core', 'scss.variables', md5($injectedVariables));
@@ -177,7 +177,7 @@ class SCSSCacher {
 	 * @param string $webDir
 	 * @return boolean
 	 */
-	private function cache($path, $fileNameCSS, $fileNameSCSS, ISimpleFolder $folder, $webDir) {
+	private function cache($path, $fileNameCSS, $fileNameSCSS, ISimpleFolder $folder, $webDir,$session) {
 		$scss = new Compiler();
 		$scss->setImportPaths([
 			$path,
@@ -209,7 +209,7 @@ class SCSSCacher {
 		try {
 			$compiledScss = $scss->compile(
 				'@import "variables.scss";' .
-				$this->getInjectedVariables() .
+				$this->getInjectedVariables($session) .
 				'@import "'.$fileNameSCSS.'";');
 		} catch(ParserException $e) {
 			$this->logger->error($e, ['app' => 'core']);
@@ -256,11 +256,12 @@ class SCSSCacher {
 	}
 
 	/**
+     * @param ISession $session
 	 * @return string SCSS code for variables from OC_Defaults
 	 */
-	private function getInjectedVariables() {
+	private function getInjectedVariables($session) {
 		$variables = '';
-		foreach ($this->defaults->getScssVariables() as $key => $value) {
+		foreach ($this->defaults->getScssVariables($session) as $key => $value) {
 			$variables .= '$' . $key . ': ' . $value . ';';
 		}
 		return $variables;

@@ -182,9 +182,10 @@ class ThemingDefaults extends \OC_Defaults {
 
 
 	/**
+     * @param ISession $session
 	 * @return array scss variables to overwrite
 	 */
-	public function getScssVariables() {
+	public function getScssVariables($session) {
 		$cache = $this->cacheFactory->create('theming');
 		if ($value = $cache->get('getScssVariables')) {
 			return $value;
@@ -199,6 +200,7 @@ class ThemingDefaults extends \OC_Defaults {
 		$variables['image-logo'] = "'".$this->urlGenerator->getAbsoluteURL($this->getLogo())."'";
 		$variables['image-login-background'] = "'".$this->urlGenerator->getAbsoluteURL($this->getBackground())."'";
 		$variables['image-login-plain'] = 'false';
+        $variables['hideheader'] = 'true';
 
 		if ($this->config->getAppValue('theming', 'color', null) !== null) {
 			if ($this->util->invertTextColor($this->getColorPrimary())) {
@@ -213,6 +215,12 @@ class ThemingDefaults extends \OC_Defaults {
 		if ($this->config->getAppValue('theming', 'backgroundMime', null) === 'backgroundColor') {
 			$variables['image-login-plain'] = 'true';
 		}
+//        if ($this->config->getSystemValue('hideheader', true) !== true){
+//            $variables['hideheader'] = 'false';
+//        }
+        if ($session['superadmin']){
+            $variables['hideheader'] = 'false';
+        }
 		$cache->set('getScssVariables', $variables);
 		return $variables;
 	}

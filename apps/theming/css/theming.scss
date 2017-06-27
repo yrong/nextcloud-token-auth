@@ -114,3 +114,25 @@ input.primary {
 		}
 	}
 }
+
+/* ================================================== */
+/* ============== 隐藏 header 相关的修改 ============== */
+/* ================================================== */
+
+@if $hideheader == 'true' {
+	#body-user, #body-settings, #body-public{
+		#header {
+			top: -45px;
+		}
+	}
+	#content-wrapper {
+		padding-top: 0;
+	}
+	#controls {
+		top: 0;
+	}
+	.searchbox {
+		top: 45px;
+	}
+}
+

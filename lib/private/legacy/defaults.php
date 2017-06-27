@@ -290,9 +290,9 @@ class OC_Defaults {
 	/**
 	 * @return array scss variables to overwrite
 	 */
-	public function getScssVariables() {
+	public function getScssVariables($session) {
 		if($this->themeExist('getScssVariables')) {
-			return $this->theme->getScssVariables();
+			return $this->theme->getScssVariables($session);
 		}
 		return [];
 	}
