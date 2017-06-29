@@ -82,6 +82,7 @@ class PreviewController extends Controller {
 	 * @param bool $a
 	 * @param bool $forceIcon
 	 * @param string $mode
+     * @param bool $originalSize
 	 * @return DataResponse|Http\FileDisplayResponse
 	 */
 	public function getPreview(
@@ -90,7 +91,8 @@ class PreviewController extends Controller {
 		$y = 32,
 		$a = false,
 		$forceIcon = true,
-		$mode = 'fill') {
+		$mode = 'fill',
+        $originalSize = false) {
 
 		if ($file === '' || $x === 0 || $y === 0) {
 			return new DataResponse([], Http::STATUS_BAD_REQUEST);
@@ -110,7 +112,11 @@ class PreviewController extends Controller {
 		}
 
 		try {
-			$f = $this->preview->getPreview($file, $x, $y, !$a, $mode);
+		    if($originalSize){
+                $f = $file;
+            }else{
+                $f = $this->preview->getPreview($file, $x, $y, !$a, $mode);
+            }
 			$response = new FileDisplayResponse($f, Http::STATUS_OK, ['Content-Type' => $f->getMimeType()]);
 
 			// Let cache this!
