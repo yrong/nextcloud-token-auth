@@ -498,7 +498,9 @@ class Request implements \ArrayAccess, \Countable, IRequest {
 		if($this->getCookie(session_name()) === null && $this->getCookie('nc_token') === null) {
 			return false;
 		}
-
+        if($this->getParam('cookie_check') === 'false'){
+            return false;
+        }
 		return true;
 	}
 
